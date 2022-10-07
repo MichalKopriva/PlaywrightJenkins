@@ -1,10 +1,30 @@
 pipeline {
-    agent { docker { image 'node:16.17.1-alpine' } }
-    stages {
-        stage('build') {
-            steps {
-                sh 'node --version'
-            }
-        }
+  agent { 
+    docker { 
+      image 'mcr.microsoft.com/playwright:v1.26.1-focal'
+    } 
+  }
+  stages {
+    stage('install playwright') {
+      steps {
+        sh '''
+          npm i -D @playwright/test
+          npx playwright install
+        '''
+      }
     }
+    stage('help') {
+      steps {
+        sh 'npx playwright test --help'
+      }
+    }
+    stage('test') {
+      steps {
+        sh '''
+          npx playwright test --list
+          npx playwright test
+        '''
+      }
+    }
+  }
 }
